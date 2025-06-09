@@ -12,7 +12,7 @@ import { NormalizeError } from '../utils'
  *  - `/index` -> `/index/index`
  */
 export function normalizePagePath(page: string): string {
-  const normalized =
+  let normalized =
     /^\/index(\/|$)/.test(page) && !isDynamicRoute(page)
       ? `/index${page}`
       : page === '/'
@@ -21,13 +21,41 @@ export function normalizePagePath(page: string): string {
 
   if (process.env.NEXT_RUNTIME !== 'edge') {
     const { posix } = require('path')
-    const resolvedPage = posix.normalize(normalized)
-    if (resolvedPage !== normalized) {
+    let finalNormalizedPath: string
+    const protocolPatternInPath = /^\/https?:\/\//i
+
+    if (protocolPatternInPath.test(normalized)) {
+      const match = normalized.match(/^(\/https?:\/\/)(.*)/i)
+      if (match) {
+        const prefix = match[1]
+        const restOfThePath = match[2]
+        const tempNormalizedRest = posix.normalize(
+          ensureLeadingSlash(restOfThePath)
+        )
+        const finalRest =
+          tempNormalizedRest === '/' &&
+          restOfThePath !== '' &&
+          !restOfThePath.startsWith('/')
+            ? restOfThePath
+            : tempNormalizedRest.substring(1)
+        finalNormalizedPath = prefix + finalRest.replace(/\/\/+/g, '/')
+      } else {
+        finalNormalizedPath = posix.normalize(normalized)
+      }
+    } else {
+      finalNormalizedPath = posix.normalize(normalized)
+    }
+
+    const originalPosixNormalized = posix.normalize(normalized)
+    if (
+      originalPosixNormalized !== normalized &&
+      !protocolPatternInPath.test(normalized)
+    ) {
       throw new NormalizeError(
-        `Requested and resolved page mismatch: ${normalized} ${resolvedPage}`
+        `Requested and resolved page mismatch: ${normalized} ${originalPosixNormalized}`
       )
     }
+    normalized = finalNormalizedPath
   }
-
   return normalized
 }

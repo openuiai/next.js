@@ -134,12 +134,21 @@ export function getResolveRoutes(
     // handle trailing slash as that is handled the same as a next.config.js
     // redirect
     if (urlNoQuery?.match(/(\\|\/\/)/)) {
-      parsedUrl = url.parse(normalizeRepeatedSlashes(req.url!), true)
-      return {
-        parsedUrl,
-        resHeaders,
-        finished: true,
-        statusCode: 308,
+      const protocolPattern = /^\/https?:\/\//i
+      if (!protocolPattern.test(urlNoQuery)) {
+        const normalizedOriginalUrl = normalizeRepeatedSlashes(req.url || '') // Uses patched normalizeRepeatedSlashes
+        parsedUrl = url.parse(
+          normalizedOriginalUrl,
+          true
+        ) as NextUrlWithParsedQuery
+        if ((req.url || '') !== normalizedOriginalUrl) {
+          return {
+            parsedUrl,
+            resHeaders: { ...resHeaders, Location: normalizedOriginalUrl },
+            finished: true,
+            statusCode: 308,
+          }
+        }
       }
     }
     // TODO: inherit this from higher up

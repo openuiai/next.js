@@ -347,14 +347,26 @@ export function isResSent(res: ServerResponse) {
 
 export function normalizeRepeatedSlashes(url: string) {
   const urlParts = url.split('?')
-  const urlNoQuery = urlParts[0]
-
-  return (
-    urlNoQuery
-      // first we replace any non-encoded backslashes with forward
-      // then normalize repeated forward slashes
+  const pathNoQueryInitial = urlParts[0]
+  const protocolPatternInPath = /^\/https?:\/\//i
+  let normalizedPathNoQuery: string
+  if (protocolPatternInPath.test(pathNoQueryInitial)) {
+    const backslashNormalized = pathNoQueryInitial.replace(/\\/g, '/')
+    const match = backslashNormalized.match(/^(\/https?:\/\/)(.*)/i)
+    if (match) {
+      const prefix = match[1]
+      const restOfThePath = match[2]
+      normalizedPathNoQuery = prefix + restOfThePath.replace(/\/\/+/g, '/')
+    } else {
+      normalizedPathNoQuery = backslashNormalized.replace(/\/\/+/g, '/')
+    }
+  } else {
+    normalizedPathNoQuery = pathNoQueryInitial
       .replace(/\\/g, '/')
-      .replace(/\/\/+/g, '/') +
+      .replace(/\/\/+/g, '/')
+  }
+  return (
+    normalizedPathNoQuery +
     (urlParts[1] ? `?${urlParts.slice(1).join('?')}` : '')
   )
 }

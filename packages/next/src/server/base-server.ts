@@ -1012,9 +1012,18 @@ export default abstract class Server<
       // handle trailing slash as that is handled the same as a next.config.js
       // redirect
       if (urlNoQuery?.match(/(\\|\/\/)/)) {
-        const cleanUrl = normalizeRepeatedSlashes(req.url!)
-        res.redirect(cleanUrl, 308).body(cleanUrl).send()
-        return
+        const protocolPattern = /^\/https?:\/\//i
+        if (!protocolPattern.test(urlNoQuery)) {
+          const normalizedOriginalUrl = normalizeRepeatedSlashes(req.url || '')
+          if ((req.url || '') !== normalizedOriginalUrl) {
+            res
+              .redirect(normalizedOriginalUrl, 308)
+              .body(normalizedOriginalUrl)
+              .send()
+            return
+          }
+          if (req.url) req.url = normalizedOriginalUrl
+        }
       }
 
       // Parse url if parsedUrl not provided

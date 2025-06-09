@@ -46,7 +46,36 @@ export class RouteMatcher<D extends RouteDefinition = RouteDefinition> {
     const result = this.test(pathname)
     if (!result) return null
 
-    return { definition: this.definition, params: result.params }
+    let params = result.params
+
+    const SPREAD_PARAM_NAME = 'url'
+    const IS_OUR_SPECIAL_ROUTE_PATH = this.definition.pathname.includes(
+      `[...${SPREAD_PARAM_NAME}]`
+    )
+
+    if (
+      IS_OUR_SPECIAL_ROUTE_PATH &&
+      params &&
+      Array.isArray(params[SPREAD_PARAM_NAME])
+    ) {
+      let originalSegments: string[] = params[SPREAD_PARAM_NAME]
+      const modifiedSegments: string[] = []
+      if (
+        originalSegments.length >= 2 &&
+        (originalSegments[0] === 'http:' || originalSegments[0] === 'https:') &&
+        originalSegments[1] === ''
+      ) {
+        modifiedSegments.push(originalSegments[0].slice(0, -1))
+        modifiedSegments.push(...originalSegments.slice(2))
+
+        params = {
+          ...params,
+          [SPREAD_PARAM_NAME]: modifiedSegments,
+        }
+      }
+    }
+
+    return { definition: this.definition, params }
   }
 
   public test(pathname: string): RouteMatchResult | null {

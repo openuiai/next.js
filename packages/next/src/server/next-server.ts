@@ -1444,10 +1444,7 @@ export default class NextNodeServer extends BaseServer<
   }
 
   private async loadNodeMiddleware() {
-    if (!this.nextConfig.experimental.nodeMiddleware) {
-      return
-    }
-
+    // Always load middleware as Node.js module
     try {
       const functionsConfig = this.renderOpts.dev
         ? {}

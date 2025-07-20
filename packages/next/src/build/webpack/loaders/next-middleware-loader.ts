@@ -59,6 +59,30 @@ export default async function middlewareLoader(this: any) {
     middlewareConfig,
   }
 
+  // Check if we're compiling for Node.js (apiNode layer)
+  const isNodeLayer = this._module?.layer === 'api-node'
+
+  if (isNodeLayer) {
+    // For Node.js layer, return a simple module that exports the middleware directly
+    return `
+      import * as _mod from ${JSON.stringify(pagePath)}
+
+      const mod = { ..._mod }
+      const handler = mod.middleware || mod.default
+
+      if (typeof handler !== 'function') {
+        throw new Error(
+          'The Middleware "${page}" must export a \`middleware\` or a \`default\` function'
+        )
+      }
+
+      // Export the middleware handler directly for Node.js context
+      export const middleware = handler
+      export const config = mod.config || {}
+      export default handler
+    `
+  }
+
   return await loadEntrypoint('middleware', {
     VAR_USERLAND: pagePath,
     VAR_DEFINITION_PAGE: page,

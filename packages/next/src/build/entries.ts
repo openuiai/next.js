@@ -9,7 +9,6 @@ import type {
   MiddlewareMatcher,
   PageStaticInfo,
 } from './analysis/get-page-static-info'
-import * as Log from './output/log'
 import type { LoadedEnvFiles } from '@next/env'
 import type { AppLoaderOptions } from './webpack/loaders/next-app-loader'
 
@@ -533,13 +532,9 @@ export function runDependingOnPageType<T>(params: {
   }
 
   if (isMiddlewareFile(params.page)) {
-    if (params.pageRuntime === 'nodejs') {
-      params.onServer()
-      return
-    } else {
-      params.onEdgeServer()
-      return
-    }
+    // Always route middleware to Node.js server
+    params.onServer()
+    return
   }
 
   if (isAPIRoute(params.page)) {
@@ -675,20 +670,12 @@ export async function createEntrypoints(
 
       let pageRuntime = staticInfo?.runtime
 
-      if (
-        isMiddlewareFile(page) &&
-        !config.experimental.nodeMiddleware &&
-        pageRuntime === 'nodejs'
-      ) {
-        Log.warn(
-          'nodejs runtime support for middleware requires experimental.nodeMiddleware be enabled in your next.config'
-        )
-        pageRuntime = 'edge'
-      }
+      // Allow middleware to run in Node.js context
+      // Removed runtime override to edge
 
       runDependingOnPageType({
         page,
-        pageRuntime: staticInfo.runtime,
+        pageRuntime: pageRuntime,
         pageType: pagesType,
         onClient: () => {
           if (isServerComponent || isInsideAppDir) {
@@ -729,19 +716,21 @@ export async function createEntrypoints(
                 isDev: false,
               })
           } else if (isMiddlewareFile(page)) {
-            server[serverBundlePath.replace('src/', '')] = getEdgeServerEntry({
-              ...params,
-              rootDir,
-              absolutePagePath: absolutePagePath,
-              bundlePath: clientBundlePath,
-              isDev: false,
-              isServerComponent,
+            // Use middleware loader but compile for Node.js
+            const loaderParams: MiddlewareLoaderOptions = {
+              absolutePagePath,
               page,
-              middleware: staticInfo?.middleware,
-              pagesType,
+              rootDir,
+              matchers: staticInfo.middleware?.matchers
+                ? encodeToBase64(staticInfo.middleware.matchers)
+                : '',
               preferredRegion: staticInfo.preferredRegion,
-              middlewareConfig: staticInfo.middleware,
-            })
+              middlewareConfig: encodeToBase64(staticInfo.middleware || {}),
+            }
+            server[serverBundlePath.replace('src/', '')] = {
+              import: `next-middleware-loader?${stringify(loaderParams)}!`,
+              layer: WEBPACK_LAYERS.apiNode,
+            }
           } else if (isAPIRoute(page)) {
             server[serverBundlePath] = [
               getRouteLoaderEntry({

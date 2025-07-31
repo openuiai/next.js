@@ -115,6 +115,8 @@ import { populateStaticEnv } from '../lib/static-env'
 
 export * from './base-server'
 
+import { setupWebSocketServer } from './websocket/setup'
+
 declare const __non_webpack_require__: NodeRequire
 
 // For module that can be both CJS or ESM
@@ -286,6 +288,12 @@ export default class NextNodeServer extends BaseServer<
     // need to populate in normal runtime env
     if (this.renderOpts.isExperimentalCompile) {
       populateStaticEnv(this.nextConfig)
+    }
+
+    try {
+      setupWebSocketServer(this)
+    } catch (error: unknown) {
+      Log.error('Failed to setup WebSocket server:', error) // TODO
     }
   }
 

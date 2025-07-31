@@ -10,6 +10,7 @@ export const HTTP_METHODS = [
   'PUT',
   'DELETE',
   'PATCH',
+  'SOCKET',
 ] as const
 
 /**

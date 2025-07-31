@@ -737,18 +737,12 @@ export async function initialize(opts: {
           )
         },
       })
-      const { matchedOutput, parsedUrl } = await resolveRoutes({
+      const { parsedUrl } = await resolveRoutes({
         req,
         res,
         isUpgradeReq: true,
         signal: signalFromNodeResponse(socket),
       })
-
-      // TODO: allow upgrade requests to pages/app paths?
-      // this was not previously supported
-      if (matchedOutput) {
-        return socket.end()
-      }
 
       if (parsedUrl.protocol) {
         return await proxyRequest(req, socket, parsedUrl, head)

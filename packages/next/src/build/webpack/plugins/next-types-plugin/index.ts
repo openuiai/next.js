@@ -94,8 +94,24 @@ checkFields<Diff<{
 ${options.type === 'route' ? `type RouteContext = { params: Promise<SegmentParams> }` : ''}
 ${
   options.type === 'route'
-    ? HTTP_METHODS.map(
-        (method) => `// Check the prop type of the entry function
+    ? HTTP_METHODS.map((method) =>
+        method === 'SOCKET'
+          ? `// Check the prop type of the SOCKET handler function
+if ('${method}' in entry) {
+  checkFields<
+    Diff<
+      ParamCheck<import('ws').WebSocketServer>,
+      {
+        __tag__: '${method}'
+        __param_position__: 'first'
+        __param_type__: FirstArg<MaybeField<TEntry, '${method}'>>
+      },
+      '${method}'
+    >
+  >()
+}
+`
+          : `// Check the prop type of the entry function
 if ('${method}' in entry) {
   checkFields<
     Diff<

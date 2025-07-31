@@ -6,6 +6,7 @@ import type { PrerenderManifest } from '../../../build'
 import type { NextURL } from '../../web/next-url'
 import type { DeepReadonly } from '../../../shared/lib/deep-readonly'
 import type { WorkUnitStore } from '../../app-render/work-unit-async-storage.external'
+import type { SocketHandler } from '../../websocket/types'
 
 import {
   RouteModule,
@@ -149,7 +150,9 @@ export type AppRouteHandlerFn = (
  * the userland module.
  */
 export type AppRouteHandlers = {
-  [method in HTTP_METHOD]?: AppRouteHandlerFn
+  [method in Exclude<HTTP_METHOD, 'SOCKET'>]?: AppRouteHandlerFn
+} & {
+  SOCKET?: SocketHandler
 }
 
 /**

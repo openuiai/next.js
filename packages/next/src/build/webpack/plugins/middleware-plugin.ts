@@ -279,6 +279,7 @@ function buildWebpackError({
 
 function isInMiddlewareLayer(parser: webpack.javascript.JavascriptParser) {
   const layer = parser.state.module?.layer
+  // Only check for edge runtime layers, not Node.js API layer
   return layer === WEBPACK_LAYERS.middleware || layer === WEBPACK_LAYERS.apiEdge
 }
 
@@ -866,9 +867,9 @@ export async function handleWebpackExternalForEdgeRuntime({
   contextInfo: any
   getResolve: () => any
 }) {
+  // Allow Node.js modules in middleware when using Node.js runtime
   if (
-    (contextInfo.issuerLayer === WEBPACK_LAYERS.middleware ||
-      contextInfo.issuerLayer === WEBPACK_LAYERS.apiEdge) &&
+    contextInfo.issuerLayer === WEBPACK_LAYERS.apiEdge &&
     isNodeJsModule(request) &&
     !supportedEdgePolyfills.has(request)
   ) {

@@ -1,0 +1,51 @@
+# PR-Agent Configuration for OpenNext.js
+
+[config]
+# Use latest Claude models for best quality reviews
+model = "anthropic/claude-sonnet-4"
+model_turbo = "anthropic/claude-3-5-haiku"
+use_turbo_for_review = false
+use_turbo_for_describe = false
+use_turbo_for_improve = false
+
+[pr_reviewer]
+# Enable automatic review
+auto_review = true
+# Remove platform-specific code warnings
+remove_previous_review_comment = true
+# Focus on OpenNext.js principles
+inline_code_comments = true
+# Review confidence threshold
+confidence_threshold = 0.7
+
+[pr_description]
+# Auto-generate comprehensive descriptions
+publish_description_as_comment = false
+# Include walkthrough of changes
+add_original_user_description = true
+# Keep descriptions concise
+max_description_length = 500
+
+[pr_code_suggestions]
+# Number of suggestions to provide
+num_code_suggestions = 4
+# Focus on high-impact suggestions
+suggestion_min_importance = 7
+# Group related suggestions
+rank_suggestions = true
+
+[pr_custom_prompt]
+# Enable custom prompts for OpenNext.js specific reviews
+enable_custom_prompt = true
+
+[pr_similar_issue]
+# Skip searching for similar issues (can be enabled later)
+skip_if_no_similar_issues = true
+
+[github]
+# PR status checks
+publish_review_as_comment = true
+# Use GitHub's review feature
+use_review_comment = true
+# Enable help command
+enable_help_command = true

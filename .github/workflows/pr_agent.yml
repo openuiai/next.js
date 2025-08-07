@@ -1,0 +1,42 @@
+name: PR Agent
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  pr_agent:
+    runs-on: ubuntu-latest
+    name: Run PR Agent
+    steps:
+      - name: PR Agent Action
+        uses: qodo-ai/pr-agent@main
+        env:
+          ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_REVIEWER.EXTRA_INSTRUCTIONS: |
+            IMPORTANT: This is OpenNext.js, a self-hosted fork of Next.js. Review against these principles from CLAUDE.md:
+            - Ensure code maintains self-hosted focus (no serverless/edge platform dependencies)
+            - Check Node.js middleware compatibility
+            - Verify no vendor lock-in introduced
+            - Follow existing patterns in the codebase
+            - Features: Native WebSocket support, unrestricted Node.js middleware, build-time image optimization, etc.
+            - Philosophy: Frameworks should define capabilities, not platforms
+          PR_DESCRIPTION.EXTRA_INSTRUCTIONS: |
+            This is OpenNext.js - a self-hosted focused fork of Next.js. When generating descriptions:
+            - Mention if changes align with OpenNext.js philosophy
+            - Note any Node.js middleware impacts
+            - Highlight removal of platform limitations if applicable
+            - Reference CLAUDE.md guidelines when relevant
+          PR_CODE_SUGGESTIONS.EXTRA_INSTRUCTIONS: |
+            Suggest improvements based on OpenNext.js principles:
+            - Prioritize self-hosted deployment compatibility
+            - Enable full Node.js API access where possible
+            - Remove platform-specific limitations

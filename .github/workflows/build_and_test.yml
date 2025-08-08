@@ -72,6 +72,7 @@ jobs:
     with:
       skipInstallBuild: 'yes'
       stepName: 'build-native'
+      timeout_minutes: 60 # Prevent resource waste from hangs
     secrets: inherit
 
   build-native-windows:
@@ -84,6 +85,7 @@ jobs:
       stepName: 'build-native-windows'
       runs_on_labels: '["windows","self-hosted","x64"]'
       buildNativeTarget: 'x86_64-pc-windows-msvc'
+      timeout_minutes: 60 # Prevent resource waste from hangs
 
     secrets: inherit
 
@@ -93,6 +95,7 @@ jobs:
     with:
       skipNativeBuild: 'yes'
       stepName: 'build-next'
+      timeout_minutes: 45 # Prevent resource waste from hangs
     secrets: inherit
 
   lint:

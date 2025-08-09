@@ -356,7 +356,7 @@ jobs:
           docker run -v "/var/run/docker.sock":"/var/run/docker.sock" \
             -e CI -e RUST_BACKTRACE -e NAPI_CLI_VERSION -e CARGO_TERM_COLOR -e CARGO_INCREMENTAL \
             -e CARGO_PROFILE_RELEASE_LTO -e CARGO_REGISTRIES_CRATES_IO_PROTOCOL -e TURBO_API \
-            -e TURBO_TEAM -e TURBO_TOKEN -e TURBO_VERSION -e TURBO_CACHE="remote:rw" \
+            -e TURBO_TOKEN -e TURBO_VERSION \
             -v ${{ env.HOME }}/.cargo/git:/root/.cargo/git \
             -v ${{ env.HOME }}/.cargo/registry:/root/.cargo/registry \
             -v ${{ github.workspace }}:/build \

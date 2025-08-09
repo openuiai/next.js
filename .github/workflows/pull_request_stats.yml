@@ -10,13 +10,15 @@ env:
   NODE_LTS_VERSION: 20
   TEST_CONCURRENCY: 6
 
-  TURBO_TEAM: 'vercel'
-  TURBO_CACHE: 'remote:rw'
+  # Turbo remote cache disabled for OpenNext.js (Vercel-specific)
+  # TURBO_TEAM: 'vercel'
+  # TURBO_CACHE: 'remote:rw'
   NEXT_TELEMETRY_DISABLED: 1
   # we build a dev binary for use in CI so skip downloading
   # canary next-swc binaries in the monorepo
   NEXT_SKIP_NATIVE_POSTINSTALL: 1
-  TEST_TIMINGS_TOKEN: ${{ secrets.TEST_TIMINGS_TOKEN }}
+  # DataDog monitoring disabled for OpenNext.js (requires paid subscription)
+  # TEST_TIMINGS_TOKEN: ${{ secrets.TEST_TIMINGS_TOKEN }}
   NEXT_TEST_JOB: 1
   NEXT_DISABLE_SWC_WASM: 1
 

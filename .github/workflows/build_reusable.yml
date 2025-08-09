@@ -196,7 +196,7 @@ jobs:
       - run: node scripts/normalize-version-bump.js
         name: normalize versions
 
-      - run: pnpm dlx turbo@${TURBO_VERSION} run build-native-release -v --env-mode loose --remote-cache-timeout 90 --summarize -- --target ${{ inputs.buildNativeTarget }}
+      - run: pnpm dlx turbo@${TURBO_VERSION} run build-native-release -v --env-mode loose --summarize -- --target ${{ inputs.buildNativeTarget }}
         if: ${{ inputs.skipNativeBuild != 'yes' }}
 
       - name: Upload next-swc artifact

@@ -15,16 +15,19 @@ env:
   # disable backtrace for test snapshots
   RUST_BACKTRACE: 0
 
-  TURBO_TEAM: 'vercel'
-  TURBO_CACHE: 'remote:rw'
+  # Turbo remote cache disabled for OpenNext.js (Vercel-specific)
+  # TURBO_TEAM: 'vercel'
+  # TURBO_CACHE: 'remote:rw'
+  TURBO_CACHE: 'local' # Use local cache only
   NEXT_TELEMETRY_DISABLED: 1
   # we build a dev binary for use in CI so skip downloading
   # canary next-swc binaries in the monorepo
   NEXT_SKIP_NATIVE_POSTINSTALL: 1
-  DATADOG_API_KEY: ${{ secrets.DATA_DOG_API_KEY }}
-  NEXT_JUNIT_TEST_REPORT: 'true'
-  DD_ENV: 'ci'
-  TEST_TIMINGS_TOKEN: ${{ secrets.TEST_TIMINGS_TOKEN }}
+  # DataDog monitoring disabled for OpenNext.js (requires paid subscription)
+  # DATADOG_API_KEY: ${{ secrets.DATA_DOG_API_KEY }}
+  # NEXT_JUNIT_TEST_REPORT: 'true'
+  # DD_ENV: 'ci'
+  # TEST_TIMINGS_TOKEN: ${{ secrets.TEST_TIMINGS_TOKEN }}
   NEXT_TEST_JOB: 1
   NEXT_TEST_PREFER_OFFLINE: 1
 
@@ -72,6 +75,7 @@ jobs:
     with:
       skipInstallBuild: 'yes'
       stepName: 'build-native'
+      timeout_minutes: 60 # Prevent resource waste from hangs
     secrets: inherit
 
   build-native-windows:
@@ -84,6 +88,7 @@ jobs:
       stepName: 'build-native-windows'
       runs_on_labels: '["windows","self-hosted","x64"]'
       buildNativeTarget: 'x86_64-pc-windows-msvc'
+      timeout_minutes: 60 # Prevent resource waste from hangs
 
     secrets: inherit
 
@@ -93,6 +98,7 @@ jobs:
     with:
       skipNativeBuild: 'yes'
       stepName: 'build-next'
+      timeout_minutes: 45 # Prevent resource waste from hangs
     secrets: inherit
 
   lint:
@@ -106,6 +112,10 @@ jobs:
 
   validate-docs-links:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

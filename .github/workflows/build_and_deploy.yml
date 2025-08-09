@@ -12,8 +12,10 @@ env:
   TURBO_VERSION: 2.3.3
   NODE_LTS_VERSION: 20
   CARGO_PROFILE_RELEASE_LTO: 'true'
-  TURBO_TEAM: 'vercel'
-  TURBO_CACHE: 'remote:rw'
+  # Turbo remote cache disabled for OpenNext.js (Vercel-specific)
+  # TURBO_TEAM: 'vercel'
+  # TURBO_CACHE: 'remote:rw'
+  TURBO_CACHE: 'local' # Use local cache only
 
 jobs:
   deploy-target:

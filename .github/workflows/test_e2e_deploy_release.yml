@@ -7,13 +7,12 @@ on:
   # allow triggering manually as well
   workflow_dispatch:
 
-env:
-  # Vercel platform tests disabled for OpenNext.js (self-hosted only)
-  # VERCEL_TEST_TEAM: vtest314-next-e2e-tests
-  # VERCEL_TEST_TOKEN: ${{ secrets.VERCEL_TEST_TOKEN }}
-  # DataDog monitoring disabled for OpenNext.js (requires paid subscription)
-  # DATADOG_API_KEY: ${{ secrets.DATA_DOG_API_KEY }}
-  # DD_ENV: 'ci'
+# Environment variables disabled for OpenNext.js:
+# env:
+#   VERCEL_TEST_TEAM: vtest314-next-e2e-tests  # Vercel platform tests (self-hosted only)
+#   VERCEL_TEST_TOKEN: ${{ secrets.VERCEL_TEST_TOKEN }}
+#   DATADOG_API_KEY: ${{ secrets.DATA_DOG_API_KEY }}  # DataDog monitoring (paid service)
+#   DD_ENV: 'ci'
 
 jobs:
   setup:

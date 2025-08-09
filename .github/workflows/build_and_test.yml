@@ -18,7 +18,6 @@ env:
   # Turbo remote cache disabled for OpenNext.js (Vercel-specific)
   # TURBO_TEAM: 'vercel'
   # TURBO_CACHE: 'remote:rw'
-  TURBO_CACHE: 'local' # Use local cache only
   NEXT_TELEMETRY_DISABLED: 1
   # we build a dev binary for use in CI so skip downloading
   # canary next-swc binaries in the monorepo

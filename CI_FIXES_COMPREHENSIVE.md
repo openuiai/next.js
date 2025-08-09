@@ -20,14 +20,12 @@ This PR fixes ALL CI issues to make the GitHub Actions pipeline fully functional
 # Before:
 TURBO_TEAM: 'vercel'
 TURBO_CACHE: 'remote:rw'
-
 # After:
 # TURBO_TEAM: 'vercel'  # Commented out
-# TURBO_CACHE: 'remote:rw'  # Commented out
-TURBO_CACHE: 'local'  # Use local cache only
+# TURBO_CACHE: 'remote:rw'  # Commented out (uses default local cache)
 ```
 
-**Rationale:** Remote cache requires Vercel infrastructure access. Local cache still provides performance benefits without external dependencies.
+**Rationale:** Remote cache requires Vercel infrastructure access. Without TURBO_CACHE set, Turbo uses local cache by default, still providing performance benefits without external dependencies.
 
 ### 2. DataDog Monitoring Disabled
 

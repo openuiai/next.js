@@ -196,7 +196,19 @@ jobs:
       - run: node scripts/normalize-version-bump.js
         name: normalize versions
 
-      - run: pnpm dlx turbo@${TURBO_VERSION} run build-native-release -v --env-mode loose --summarize -- --target ${{ inputs.buildNativeTarget }}
+      - run: |
+          echo "Starting build-native-release for target: ${{ inputs.buildNativeTarget }}"
+          echo "Setting cargo network timeouts..."
+          export CARGO_NET_GIT_FETCH_WITH_CLI=true
+          export CARGO_NET_RETRY=3
+          export CARGO_HTTP_TIMEOUT=30
+          export CARGO_HTTP_LOW_SPEED_LIMIT=10
+          export CARGO_HTTP_LOW_SPEED_TIMEOUT=30
+          echo "Running turbo build..."
+          timeout 1800 pnpm dlx turbo@${TURBO_VERSION} run build-native-release -v --env-mode loose --summarize -- --target ${{ inputs.buildNativeTarget }} || {
+            echo "Build timed out or failed after 30 minutes"
+            exit 1
+          }
         if: ${{ inputs.skipNativeBuild != 'yes' }}
 
       - name: Upload next-swc artifact
